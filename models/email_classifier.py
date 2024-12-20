@@ -1,23 +1,33 @@
-# Machine Learning Email Classifier
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import make_pipeline
+
 class EmailClassifier:
     def __init__(self):
-        self.priority_keywords = {
-            "high": ["urgent", "asap", "important", "action required", "deadline"],
-            "medium": ["follow up", "reminder", "check", "update"],
-            "low": ["info", "newsletter", "FYI", "no action required"]
-        }
+        # Exemple de jeu de données pour l'entraînement avec sujet + corps
+        self.train_data = [
+            ("Urgent! Please respond ASAP", "Please respond ASAP, deadline approaching", "high"),
+            ("Reminder: Meeting tomorrow", "Don't forget the meeting at 3pm tomorrow", "medium"),
+            ("Newsletter: Updates for this month", "Check out the latest updates in our newsletter", "low"),
+            ("Deadline for report submission", "Please submit your report by the end of the day", "high"),
+            ("Follow up on your last email", "Just following up on my previous message regarding the proposal", "medium"),
+            ("FYI: New policies announced", "Important update regarding new company policies", "low")
+        ]
+        
+        self.model = self._train_model()
 
-    def classify_by_keywords(self, email_body):
-        """Classify email priority based on the presence of keywords."""
-        email_body_lower = email_body.lower()  # Convert email body to lowercase for case-insensitive matching
+    def _train_model(self):
+        """Entraînement du modèle de machine learning avec TF-IDF et Naive Bayes."""
+        # On combine le sujet et le corps pour chaque email
+        texts = [f"{subject} {body}" for subject, body, label in self.train_data]  # Combinaison du sujet et du corps
+        labels = [label for subject, body, label in self.train_data]  # Récupérer les labels
 
-        for priority, keywords in self.priority_keywords.items():
-            for keyword in keywords:
-                if keyword in email_body_lower:
-                    return priority  # Return the priority as soon as a match is found
+        # Création et entraînement du modèle
+        model = make_pipeline(TfidfVectorizer(), MultinomialNB())
+        model.fit(texts, labels)  # Entraîner sur les textes combinés (sujet + corps)
+        return model
 
-        return "low"  # Default to 'low' priority if no keywords are matched
-
-    def predict_priority(self, email_body):
-        """Wrapper to integrate keyword classification into ML-based prediction if needed."""
-        return self.classify_by_keywords(email_body)
+    def predict_priority(self, subject, body):
+        """Prédire la priorité en combinant le sujet et le corps de l'email."""
+        combined_text = f"{subject} {body}"  # Combiner sujet et corps
+        return self.model.predict([combined_text])[0]  # Prédire la priorité avec le modèle
