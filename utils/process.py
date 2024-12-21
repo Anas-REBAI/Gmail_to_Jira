@@ -1,4 +1,3 @@
-from flask import Flask
 import threading
 import time
 import logging
@@ -6,19 +5,16 @@ from models.email_parser import EmailParser
 from models.email_classifier import EmailClassifier
 from models.email_translator import EmailTranslator
 from utils.predict import predict_translate_and_create_jira_issue
-from config.settings import APP_HOST, APP_PORT, EMAIL_USER, EMAIL_PASS, IMAP_SERVER, DEEPL_API_KEY
+from config.settings import EMAIL_USER, EMAIL_PASS, IMAP_SERVER, DEEPL_API_KEY
 
-# Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Logger configuration
 logger = logging.getLogger(__name__)
 
-# Flask application 
-app = Flask(__name__)
-
+# Thread control
 stop_event = threading.Event()
 
-# Main function to execute periodically
 def process_emails():
+    """Main logic for processing emails."""
     try:
         logger.info("Starting email processing...")
         
@@ -32,34 +28,24 @@ def process_emails():
         # Fetch Emails
         emails = email_parser.fetch_emails()
 
-        # Predict priority, Translate email and create jira issue
+        # Predict Priority, Translate email and create Jira issue
         predict_translate_and_create_jira_issue(emails, classifier, translator)
 
         logger.info("Email processing completed.")
     except Exception as e:
         logger.error(f"Error during email processing: {e}")
 
-# Periodic task in a thread
 def run_periodic_task():
+    """Thread loop to periodically execute the email processing."""
     while not stop_event.is_set():
         process_emails()
         time.sleep(60)
 
-# Background task
 def start_background_task():
-    thread = threading.Thread(target=run_periodic_task)
-    thread.daemon = True
+    """Start the background thread."""
+    thread = threading.Thread(target=run_periodic_task, daemon=True)
     thread.start()
 
-# Cleanly stop the thread
-@app.before_request
-def shutdown_task():
+def stop_background_task():
+    """Stop the background thread."""
     stop_event.set()
-
-# Main execution
-if __name__ == "__main__":
-    start_background_task()
-    try:
-        app.run(host=APP_HOST, port=APP_PORT)
-    finally:
-        stop_event.set()

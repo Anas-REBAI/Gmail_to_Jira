@@ -2,7 +2,7 @@ from utils.sendEmail import send_email
 from models.jira_integration import JiraIntegration
 from config.settings import EMAIL_USER, EMAIL_PASS, JIRA_URL, JIRA_API_TOKEN, JIRA_PROJECT_KEY
 
-def predict_translate_and_create_issueJira(emails, classifier, translator):
+def predict_translate_and_create_jira_issue(emails, classifier, translator):
     """Filter, display, translate emails based on their priority and create issue jira."""
 
     # Initialize Jira Integration
