@@ -2,7 +2,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
 def send_email(sender_email, sender_password, receiver_email, subject, body):
     """Send an email using SMTP."""
     message = MIMEMultipart()

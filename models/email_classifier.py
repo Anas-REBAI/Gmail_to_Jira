@@ -29,5 +29,9 @@ class EmailClassifier:
 
     def predict_priority(self, subject, body):
         """Prédire la priorité en combinant le sujet et le corps de l'email."""
+        if not subject or not body:
+            return "Low"  # Priorité par défaut pour les emails vides
+        
         combined_text = f"{subject} {body}"  # Combiner sujet et corps
-        return self.model.predict([combined_text])[0]  # Prédire la priorité avec le modèle
+        predicted_priority = self.model.predict([combined_text])[0]  # Prédire la priorité
+        return predicted_priority.capitalize()  # Mettre la première lettre en majuscule
