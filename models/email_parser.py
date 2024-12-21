@@ -51,9 +51,9 @@ class EmailParser:
             
             self.connection.select_folder("INBOX")
 
-            # Filter for UNREAD emails from a specific sender
-            messages = self.connection.search(["UNSEEN", "FROM", "anasrebai3@gmail.com"])
-            print(f"Found {len(messages)} unread email(s) from anasrebai3@gmail.com")
+            # Search for UNREAD emails from @esprit.tn only
+            messages = self.connection.search(['UNSEEN', 'FROM', '@esprit.tn'])
+            print(f"Found {len(messages)} unread email(s) from @esprit.tn")
 
             if not messages:
                 return []  # No unread emails from this sender

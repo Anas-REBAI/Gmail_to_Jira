@@ -4,7 +4,7 @@ from sklearn.pipeline import make_pipeline
 
 class EmailClassifier:
     def __init__(self):
-        # Exemple de jeu de données pour l'entraînement avec sujet + corps
+        # Example training dataset with subject + body
         self.train_data = [
             ("Urgent! Please respond ASAP", "Please respond ASAP, deadline approaching", "high"),
             ("Reminder: Meeting tomorrow", "Don't forget the meeting at 3pm tomorrow", "medium"),
@@ -18,20 +18,20 @@ class EmailClassifier:
 
     def _train_model(self):
         """Entraînement du modèle de machine learning avec TF-IDF et Naive Bayes."""
-        # On combine le sujet et le corps pour chaque email
-        texts = [f"{subject} {body}" for subject, body, label in self.train_data]  # Combinaison du sujet et du corps
-        labels = [label for subject, body, label in self.train_data]  # Récupérer les labels
+        # Combine the subject and body for each email
+        texts = [f"{subject} {body}" for subject, body, label in self.train_data]
+        labels = [label for subject, body, label in self.train_data]
 
-        # Création et entraînement du modèle
+        # Create and train the model
         model = make_pipeline(TfidfVectorizer(), MultinomialNB())
-        model.fit(texts, labels)  # Entraîner sur les textes combinés (sujet + corps)
+        model.fit(texts, labels)
         return model
 
     def predict_priority(self, subject, body):
         """Prédire la priorité en combinant le sujet et le corps de l'email."""
         if not subject or not body:
-            return "Low"  # Priorité par défaut pour les emails vides
+            return "Low"  # Default priority for empty emails
         
-        combined_text = f"{subject} {body}"  # Combiner sujet et corps
-        predicted_priority = self.model.predict([combined_text])[0]  # Prédire la priorité
-        return predicted_priority.capitalize()  # Mettre la première lettre en majuscule
+        combined_text = f"{subject} {body}"  # Combine subject and body
+        predicted_priority = self.model.predict([combined_text])[0]  # Predict the priority
+        return predicted_priority.capitalize()  # Capitalize the first letter of the priority

@@ -8,12 +8,12 @@ class JiraIntegration:
     def create_task(self, project_key, summary, description, priority):
         """Create a Jira task."""
         try:
-            # Vérifiez si la priorité existe dans Jira
+            # Priority existence in Jira
             available_priorities = {p.name: p.id for p in self.client.priorities()}
             if priority not in available_priorities:
                 raise ValueError(f"Invalid priority '{priority}'. Available priorities: {', '.join(available_priorities.keys())}")
 
-            # Création de l'issue
+            # Create Issue
             issue_dict = {
                 'project': {'key': project_key},
                 'summary': summary,

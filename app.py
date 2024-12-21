@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 stop_event = threading.Event()
 
-# Fonction principale à exécuter périodiquement
+# Main function to execute periodically
 def process_emails():
     try:
         logger.info("Starting email processing...")
@@ -32,26 +32,26 @@ def process_emails():
         # Fetch Emails
         emails = email_parser.fetch_emails()
 
-        # Predict Priority, Translate email and create issue jira
+        # Predict priority, Translate email and create jira issue
         predict_translate_and_create_issueJira(emails, classifier, translator)
 
         logger.info("Email processing completed.")
     except Exception as e:
         logger.error(f"Error during email processing: {e}")
 
-# Tâche périodique en thread
+# Periodic task in a thread
 def run_periodic_task():
     while not stop_event.is_set():
         process_emails()
         time.sleep(60)
 
-# La tâche en arrière-plan
+# Background task
 def start_background_task():
     thread = threading.Thread(target=run_periodic_task)
     thread.daemon = True
     thread.start()
 
-# Arrêter proprement le thread
+# Cleanly stop the thread
 @app.before_request
 def shutdown_task():
     stop_event.set()
