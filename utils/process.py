@@ -20,11 +20,12 @@ def process_emails():
         
         # Initialize Components
         email_parser = EmailParser(EMAIL_USER, EMAIL_PASS, IMAP_SERVER)
-        email_parser.connect()
-
         classifier = EmailClassifier()
         translator = EmailTranslator(DEEPL_API_KEY)
 
+        # Connect to gmail
+        email_parser.connect()
+        
         # Fetch Emails
         emails = email_parser.fetch_emails()
 

@@ -14,13 +14,17 @@ def predict_translate_and_create_jira_issue(emails, classifier, translator):
         for subject, sender, body in emails:
             if not subject.strip() or not body.strip():
                 print(f"Skipping email from {sender} with empty subject or body.")
+                send_email(
+                    sender_email=EMAIL_USER,
+                    sender_password=EMAIL_PASS,
+                    receiver_email=EMAIL_USER,
+                    subject="Email Notification",
+                    body=f"Skipping email from {sender} with empty subject or body. Error creating Jira task."
+                )
                 continue
 
             # Classify the emails
             priority = classifier.predict_priority(subject, body)
-
-            # Display basic email information
-            print(f"\nFrom: {sender}\nSubject: {subject}\nPriority: {priority}")
 
             # Translate the email body if necessary
             translated_body = None
@@ -30,13 +34,13 @@ def predict_translate_and_create_jira_issue(emails, classifier, translator):
                 except Exception as e:
                     translated_body = f"Translation error: {e}"
 
-            # Display the translated body
-            print(f"Body (Translated): {translated_body}\n")
+            # Display basic email information and the translated body
+            print(f"\nFrom: {sender}\nSubject: {subject}\nPriority: {priority}\nBody (original): {body}\nBody (Translated): {translated_body}\n")
 
             # Create a Jira task
             jira.create_task(
                 project_key=JIRA_PROJECT_KEY,
-                summary=f"[{priority}] Email: {subject}",
+                summary=f"[{priority}] {subject}",
                 description=f"Sender: {sender}\n\nBody:\n{translated_body}",
                 priority=priority
             )

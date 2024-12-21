@@ -51,7 +51,7 @@ class EmailParser:
             
             self.connection.select_folder("INBOX")
 
-            # Search for UNREAD emails from @esprit.tn only
+            # Search for UNREAD emails from specific domain only
             messages = self.connection.search(['UNSEEN', 'FROM', '@esprit.tn'])
             print(f"Found {len(messages)} unread email(s) from @esprit.tn")
 
