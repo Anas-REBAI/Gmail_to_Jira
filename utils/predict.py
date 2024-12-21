@@ -23,24 +23,26 @@ def predict_translate_and_create_jira_issue(emails, classifier, translator):
                 )
                 continue
 
+            # Translate the subject and body if necessary
+            translations = translator.translate_email_subject_and_body(subject, body, target_language="EN-US")
+            translated_subject = translations.get("translated_subject", subject)
+            translated_body = translations.get("translated_body", body)
+
+            if not translated_subject or not translated_body:
+                translated_subject = subject
+                translated_body = body
+
             # Classify the emails
-            priority = classifier.predict_priority(subject, body)
+            priority = classifier.predict_priority(translated_subject, translated_body)
 
-            # Translate the email body if necessary
-            translated_body = None
-            if body.strip():
-                try:
-                    translated_body = translator.translate_email(body, "EN-US")
-                except Exception as e:
-                    translated_body = f"Translation error: {e}"
-
-            # Display basic email information and the translated body
-            print(f"\nFrom: {sender}\nSubject: {subject}\nPriority: {priority}\nBody (original): {body}\nBody (Translated): {translated_body}\n")
+            # Display basic email information and the translated content
+            print(f"\nFrom: {sender}\nSubject (original): {subject}\nSubject (Translated): {translated_subject}")
+            print(f"Priority: {priority}\nBody (original): {body}\nBody (Translated): {translated_body}")
 
             # Create a Jira task
             jira.create_task(
                 project_key=JIRA_PROJECT_KEY,
-                summary=f"[{priority}] {subject}",
+                summary=f"[{priority}] {translated_subject}",
                 description=f"Sender: {sender}\n\nBody:\n{translated_body}",
                 priority=priority
             )
@@ -52,5 +54,5 @@ def predict_translate_and_create_jira_issue(emails, classifier, translator):
                     sender_password=EMAIL_PASS,
                     receiver_email=EMAIL_USER,
                     subject="Email Notification",
-                    body=f"{priority} Email received from {sender} with subject: {subject}.\nEmail Body: {translated_body}"
+                    body=f"{priority} Email received from {sender} with subject: {translated_subject}.\nEmail Body: {translated_body}"
                 )
