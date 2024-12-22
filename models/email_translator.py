@@ -5,7 +5,7 @@ class EmailTranslator:
         """Initialize the EmailTranslator with a DeepL API key."""
         self.translator = deepl.Translator(api_key)
 
-    def translate_email(self, text, target_language="EN-US"):
+    def translate_txt(self, text, target_language="EN-US"):
         """Translate a single piece of text into the specified target language."""
         # Define valid target languages supported by DeepL
         valid_languages = ["EN-US", "DE", "FR", "IT", "ES", "PL", "NL", "PT", "RU", "JA", "ZH"]
@@ -30,10 +30,10 @@ class EmailTranslator:
         translated_body = None
 
         if subject.strip():  # Translate the subject if it exists
-            translated_subject = self.translate_email(subject, target_language)
+            translated_subject = self.translate_txt(subject, target_language)
 
         if body.strip():  # Translate the body if it exists
-            translated_body = self.translate_email(body, target_language)
+            translated_body = self.translate_txt(body, target_language)
 
         return {
             "translated_subject": translated_subject,
