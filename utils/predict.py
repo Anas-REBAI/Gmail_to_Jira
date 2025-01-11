@@ -46,13 +46,3 @@ def predict_translate_and_create_jira_issue(emails, classifier, translator):
                 description=f"Sender: {sender}\n\nBody:\n{translated_body}",
                 priority=priority
             )
-
-            # Send a notification email only for high-priority emails
-            if priority.lower() in ["high"]:
-                send_email(
-                    sender_email=EMAIL_USER,
-                    sender_password=EMAIL_PASS,
-                    receiver_email=EMAIL_USER,
-                    subject="Email Notification",
-                    body=f"{priority} Email received from {sender} with subject: {translated_subject}.\nEmail Body: {translated_body}"
-                )
